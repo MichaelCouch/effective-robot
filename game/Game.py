@@ -22,10 +22,10 @@ class Game(object):
 
         """
         return {
-            id: {
+            player.id: {
                  "player": player,
                  "score": 0,
-            } for id, player in enumerate(players)
+            } for player in players
         }
 
     def take_turn(self, player_id):
@@ -66,6 +66,7 @@ class Game(object):
                 {'name': name of variable,
                  'type': type of data - continuous, discrete, ordinal, categorical
                  'value': value of data (atomic, or numpy array)
+                 'scores': {player_id: score, ...}
                 }, ...
             ]
         }
