@@ -66,9 +66,9 @@ class Game(object):
                 {'name': name of variable,
                  'type': type of data - continuous, discrete, ordinal, categorical
                  'value': value of data (atomic, or numpy array)
-                 'scores': {player_id: score, ...}
                 }, ...
-            ]
+            ],
+            'scores': {player_id: score, ...}
         }
 
         :player_id: id of the player
