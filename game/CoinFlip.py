@@ -8,15 +8,15 @@ class CoinFlip(Game):
 
     """A game where a weighted coin is flipped"""
 
-    def __init__(self, players, bias=0.5):
+    def __init__(self, players, coin_bias=0.5):
         """
-
-        :bias: between 0 and 1.
+        :player: list of players for the game
+        :coin_bias: between 0 and 1.
 
         """
         Game.__init__(self, players)
 
-        self._bias = bias
+        self._bias = coin_bias
         self._turn_order = [player_id for player_id in self._players]
         self._next_player = 0
 
@@ -33,7 +33,8 @@ class CoinFlip(Game):
             "scores": {
                 player_id: player_data['score']
                 for player_id, player_data in self._players.items()
-            }
+            },
+            "game_over": False
         }
 
     def get_next_player(self):
@@ -54,3 +55,6 @@ class CoinFlip(Game):
         flip = 'h' if random() < self._bias else 't'
         if flip == guess:
             self._players[player_id]['score'] += 1
+
+        self._next_player = (self.next_player + 1) % len(self.players)
+
