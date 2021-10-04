@@ -57,4 +57,3 @@ class CoinFlip(Game):
             self._players[player_id]['score'] += 1
 
         self._next_player = (self.next_player + 1) % len(self.players)
-

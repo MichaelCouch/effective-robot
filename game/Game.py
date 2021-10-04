@@ -12,6 +12,7 @@ class Game(object):
         """
         self._players = self._initialize_players(players)
         self._game_state = None
+        self._game_over = False
 
     def _initialize_players(self, players):
         """Set up a data structure containing the players in the game,
@@ -27,6 +28,17 @@ class Game(object):
                  "score": 0,
             } for player in players
         }
+
+    def run_game(self):
+        """Run the game, returning the scores at the end of the game
+        :returns: Dictionary of scores
+
+        """
+        while not self._game_over:
+            next_player = self.get_next_player()
+            self.take_turn(next_player)
+
+        return
 
     def take_turn(self, player_id):
         """Allow a player to take their turn in the game.
@@ -65,7 +77,8 @@ class Game(object):
             "moves": [...],
             "observation": [
                 {'name': name of variable,
-                 'type': type of data - continuous, discrete, ordinal, categorical
+                 'type': type of data - continuous, discrete,
+                                        ordinal, categorical
                  'value': value of data (atomic, or numpy array)
                 }, ...
             ],
@@ -78,4 +91,3 @@ class Game(object):
 
         """
         pass
-
