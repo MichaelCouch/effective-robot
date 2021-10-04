@@ -17,9 +17,9 @@ class Human(Player):
         :returns: move listed in observations
 
         """
-        print(f"It's player {self.id}'s turn.")
+        print(f"\n\nIt's player {self.id}'s turn.")
         print("Scores are:")
-        for player_id, score in observation['scores']:
+        for player_id, score in observation['scores'].items():
             print(f"{player_id}: {score}")
 
         print("The game looks like")
@@ -27,7 +27,7 @@ class Human(Player):
 
         return self.read_move(observation['moves'])
 
-    def get_move(self, moves):
+    def read_move(self, moves):
         """Get the next player move, with checking
 
         :moves: list of strings

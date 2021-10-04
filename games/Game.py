@@ -47,7 +47,7 @@ class Game(object):
         """
         observation = self.get_player_observation(player_id)
 
-        player = self._players[player_id]
+        player = self._players[player_id]['player']
 
         move = player.select_move(observation)
 

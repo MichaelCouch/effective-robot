@@ -42,7 +42,7 @@ class CoinFlip(Game):
         :returns: player_id
 
         """
-        return self._players[self._next_player]
+        return self._turn_order[self._next_player]
 
     def make_move(self, player_id, guess):
         """player_id selects heads (h) or tails (t), and the coin is flipped.
@@ -56,4 +56,4 @@ class CoinFlip(Game):
         if flip == guess:
             self._players[player_id]['score'] += 1
 
-        self._next_player = (self.next_player + 1) % len(self.players)
+        self._next_player = (self._next_player + 1) % len(self._players)
