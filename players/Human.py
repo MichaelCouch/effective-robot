@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from Player import Player
+from .Player import Player
 
 
 class Human(Player):

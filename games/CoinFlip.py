@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from Game import Game
+from .Game import Game
 from random import random
 
 
