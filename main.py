@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 from games import CoinFlip
-from players import Human
+from players import Human 
+from players import Randomplayer
 
-players = [Human('Lily'), Human('Michael')]
+players = [Human('Lily'), Human('Michael'), Randomplayer('Lilith')]
 
 game = CoinFlip(players)
 
