@@ -2,8 +2,9 @@
 
 from games import CoinFlip
 from players import Human
+from players import RandomPlayer
 
-players = [Human('Lily'), Human('Michael')]
+players = [Human("Lily"), Human("Michael"), RandomPlayer("Lilith")]
 
 game = CoinFlip(players)
 

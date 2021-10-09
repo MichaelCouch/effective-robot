@@ -17,7 +17,7 @@ class Human(Player):
         :returns: move listed in observations
 
         """
-        print(f"\n\nIt's player {self.id}'s turn.")
+        print(f"\n\nIt's human player {self.id}'s turn.")
         print("Scores are:")
         for player_id, score in observation['scores'].items():
             print(f"{player_id}: {score}")
