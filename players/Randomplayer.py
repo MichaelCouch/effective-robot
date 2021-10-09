@@ -8,9 +8,10 @@ import random
 class RandomPlayer(Player):
 
     """A class representing a random player.
-    A random player who always guess randomly with the flipped coin game.
+    A random player who always make the move randomly.
     A random player can still observe the state of the game
-    (however this does not impact their decicion for next move), then select a move to make.
+    (however this does not impact their decicion for next move),
+    then select a move to make.
     """
 
     def __init__(self, id):
