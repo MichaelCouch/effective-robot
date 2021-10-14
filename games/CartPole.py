@@ -89,7 +89,7 @@ class CartPole(Game):
         if self._game_over:
            score = self._players[player_id]['score']
            print("The pole has fallen.")
-           print(f"Player {player_id} kept the pole up for {score} seconds!")
+           print(f"Player {player_id} kept the pole up for {round(score,1)} seconds!")
 
 
 class CartPoleObservation():
@@ -204,10 +204,10 @@ class CartPoleObservation():
                       round(self._vel, 2),
                       round(self._angle * 180 / pi),
                       round(self._ang_vel * 180 / pi))
-        result += "\n\n"
-        result += f"The cart is at position {x} travelling at speed {v},"
-        result += f"the pole is at an angle {a} degrees and with"
-        result += f"angular velocity {z} degrees per second."
+        result += "\n"
+        result += f"\nThe cart is at position {x} travelling at speed {v},"
+        result += f"\nthe pole is at an angle {a} degrees and with"
+        result += f"\nangular velocity {z} degrees per second."
         if self._game_over:
             result += "\nThe pole has fallen over!"
         return result
