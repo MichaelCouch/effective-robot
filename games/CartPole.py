@@ -36,6 +36,8 @@ class CartPole(Game):
         self._time_step = 0.1 if time_step is None else time_step
         # It's a single player game
         self._player_id = list(self._players.keys())[0]
+        self._pole_owner = list(self._players.keys())[1] + "'s " if len(self._players) > 1 else 'the '
+ 
 
     def get_cur_state(self):
         return array([self._pos, self._vel, self._angle])
@@ -89,7 +91,7 @@ class CartPole(Game):
         if self._game_over:
            score = self._players[player_id]['score']
            print("The pole has fallen.")
-           print(f"Player {player_id} kept the pole up for {round(score,1)} seconds!")
+           print(f"Player {player_id} kept {self._pole_owner} pole up for {round(score,1)} seconds!")
 
 
 class CartPoleObservation():
