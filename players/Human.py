@@ -4,8 +4,7 @@ from .Player import Player
 
 
 class Human(Player):
-    """A class implementing a human player manually taking turns
-    """
+    """A class implementing a human player manually taking turns"""
 
     def __init__(self, id):
         Player.__init__(self, id)
@@ -18,14 +17,14 @@ class Human(Player):
 
         """
         print(f"\n\nIt's human player {self.id}'s turn.")
-        print("Scores are:")
-        for player_id, score in observation['scores'].items():
+        print("Scores and win rates of player's guesses are:")
+        for player_id, score in observation["scores"].items():
             print(f"{player_id}: {score}")
+            print(observation["observation"])
 
-        print("The game looks like")
-        print(observation['observation'])
+        # print(f"Human player {self.id}'s win rate:")
 
-        return self.read_move(observation['moves'])
+        return self.read_move(observation["moves"])
 
     def read_move(self, moves):
         """Get the next player move, with checking

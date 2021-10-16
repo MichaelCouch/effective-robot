@@ -8,17 +8,23 @@ class CoinFlip(Game):
 
     """A game where a weighted coin is flipped"""
 
-    def __init__(self, players, coin_bias=0.5):
+    def __init__(self, players, coin_bias=0.5, goal=5):
         """
         :player: list of players for the game
         :coin_bias: between 0 and 1.
+        :goal: goal score of the winner for the game
 
         """
         Game.__init__(self, players)
 
         self._bias = coin_bias
+        self._goal = goal
         self._turn_order = [player_id for player_id in self._players]
         self._next_player = 0
+        self._rounds = 0
+        self._guess_h = 0
+        self._guess_t = 0
+        self._game_over = False
 
     def get_player_observation(self, player_id):
         """Provide the observation of the state of the game to the play
@@ -28,13 +34,20 @@ class CoinFlip(Game):
 
         """
         return {
-            "moves": ['h', 't'],
-            "observation": [],
+            "moves": ["h", "t"],
+            "observation": {
+                "h": "{0:.0%}".format(
+                    self._guess_h / (self._rounds or not self._rounds)
+                ),
+                "t": "{0:.0%}".format(
+                    self._guess_t / (self._rounds or not self._rounds)
+                ),
+            },
             "scores": {
-                player_id: player_data['score']
+                player_id: player_data["score"]
                 for player_id, player_data in self._players.items()
             },
-            "game_over": False
+            "game_over": self._game_over,
         }
 
     def get_next_player(self):
@@ -52,8 +65,23 @@ class CoinFlip(Game):
         :returns: None
 
         """
-        flip = 'h' if random() < self._bias else 't'
+        flip = "h" if random() < self._bias else "t"
+        self._rounds += 1
+
         if flip == guess:
-            self._players[player_id]['score'] += 1
+            self._players[player_id]["score"] += 1
+
+        if guess == "h":
+            self._guess_h += 1
+        else:
+            self._guess_t += 1
 
         self._next_player = (self._next_player + 1) % len(self._players)
+
+        if self._players[player_id]["score"] == self._goal:
+            self._game_over = True
+
+        if self._game_over:
+            score = self._players[player_id]["score"]
+            print("(-*^O^*-) We have a winner!")
+            print(f"Player {player_id} hit {self._goal} points first!")
