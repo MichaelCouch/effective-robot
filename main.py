@@ -7,7 +7,7 @@ from players import RandomPlayer
 
 players = [Human("Lily"), Human("Michael"), RandomPlayer("Lilith")]
 
-game = CartPole(players)
-
+# game = CartPole(players)
+game = CoinFlip(players)
 end_scores = game.run_game()
 print(end_scores)

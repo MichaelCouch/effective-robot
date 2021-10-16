@@ -25,14 +25,13 @@ class RandomPlayer(Player):
         :returns: move listed in observations
 
         """
-        moves = observation['moves']
+        moves = observation["moves"]
         print(f"\n\nIt's random player {self.id}'s turn.")
         print("Scores are:")
         for player_id, score in observation["scores"].items():
             print(f"{player_id}: {score}")
+            print(observation["observation"])
 
-        print("The game looks like")
-        print(observation["observation"])
         move = random.choice(moves)
         print(f"Our random player {self.id} guessed {move}")
         return move
