@@ -8,12 +8,15 @@ class SimpleNeuralNet(Player):
 
     """A complete neural network with a single hidden layer and"""
 
-    def __init__(self, id, n):
+    def __init__(self, id, n, discount=0.9, learning_rate=0.1):
         """
         The number of nodes in the hidden layer
         """
         Player.__init__(self, id)
         self._n = n
+        self._discount = discount
+        self._learning_rate = learning_rate
+
         self._input = random_sample((0, 1))
 
         # Perceptron
@@ -35,11 +38,35 @@ class SimpleNeuralNet(Player):
         self._last_action = None
 
     def select_move(self, observation):
+        # Update known state data
+        for var in observation['observations']:
+            if var['name'] in self._variables:
+                self._input[self._variables.index(var['name']),1] = var['value']
 
-        # Update the neural network based on our new score
-        # TODO
+        if self._last_score and self._last_action:
+            ## Update the neural network based on our new score
+            previous_state_action_value = self._output['activations'][self._actions.index(self._last_action)]
+            new_score = observation['scores'][self._id]
+            points_awarded = self._last_score = new_score
 
-        # Add data of any never-before-seen moves and state data
+            # Update the state
+            self._update_activations()
+            current_state_value = np.max(self._output['activations'])
+
+            error = points_awarded - (
+                previous_state_action_value - self._discount * current_state_value
+            )
+
+            # Update network weights and biases by gradient descent
+
+            # TODO
+
+            # self._Wi += ...
+            # self._Wo += ...
+            # self._hidden['bias'] += ...
+            # self._output['bias'] += ...
+
+        ## Add data of any never-before-seen moves and state data
         actions = observation['moves']
         for action in actions:
             if action not in self._actions:
@@ -50,12 +77,13 @@ class SimpleNeuralNet(Player):
                 assert isinstance(var['value'], float) or isinstance(var['value'],int), 'Only accepting atomic numbers for SimpleNeuralNet'
                 self._add_variable(var)
 
-
-        # Select the next move to make
-        # Not all actions we know about could be valid
+        ## Select the next move to make
+        self._update_activations()
+        # Not all actions we know about are valid so restrict
         valid = [action in actions for action in self._actions]
         moves = [action for action in self._actions if action in actions]
 
+        # Use activation levels to pick a move randomly
         cdf = np.cumsum(softmax(self._output['activation'][valid]))
         r = random_sample()
         move = 0
@@ -99,6 +127,7 @@ class SimpleNeuralNet(Player):
         :returns: None
 
         """
+        # Update from start to end of neural network
         self._hidden['activation'] = self._p(
             self._Wi.dot(self._input) \
             - self._hidden['bias'] \
