@@ -19,9 +19,11 @@ class SimpleNeuralNet(Player):
 
         self._input = random_sample((0, 1))
 
-        # Perceptron
-        self._p = lambda x: 1  / (1 - np.exp(-x))
-        self._dp = lambda x: np.exp(-x) / (1 - np.exp(-x))**2
+        # Perceptrons
+        self._p1 = lambda x: 1  / (1 - np.exp(-x))
+        self._dp1 = lambda x: np.exp(-x) / (1 - np.exp(-x))**2
+        self._p2 = lambda x: 1  / (1 - np.exp(-x))
+        self._dp2 = lambda x: np.exp(-x) / (1 - np.exp(-x))**2
 
         # Biases and activation levels
         self._hidden = {'bias': random_sample((self._n, 1)), 'activation': np.zeros((self._n, 1))}
@@ -56,15 +58,37 @@ class SimpleNeuralNet(Player):
             error = points_awarded - (
                 previous_state_action_value - self._discount * current_state_value
             )
+            update_vector = np.zeros(self._output['activations'].shape)
+            update_vector[self._actions.index(self._last_action),1] = error
 
             # Update network weights and biases by gradient descent
 
-            # TODO
+            dWi = (
+                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
+                * self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
+                * self._Wo * self._input
+            )
 
-            # self._Wi += ...
-            # self._Wo += ...
-            # self._hidden['bias'] += ...
-            # self._output['bias'] += ...
+            dWo = (
+                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
+                * self._hidden['activation']
+            )
+
+            dhb = - (
+                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
+                * self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
+                * self._Wo
+            )
+
+            dob = - (
+                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
+            )
+
+            self._Wi += self._learning_rate * dWi.dot(update_vector)
+            self._Wo += self._learning_rate * dWo.dot(update_vector)
+            self._hidden['bias'] += self._learning_rate * dhb.dot(update_vector)
+            self._output['bias'] += self._learning_rate * dob.dot(update_vector)
+            
 
         ## Add data of any never-before-seen moves and state data
         actions = observation['moves']
@@ -90,7 +114,8 @@ class SimpleNeuralNet(Player):
         while r > cdf[move]:
             move += 1
 
-        self._last_action = self._moves[move]
+        self._last_score = observation['scores'][self._id]
+        self._last_action = self._actions[move]
         return self._last_action
 
 
@@ -128,12 +153,12 @@ class SimpleNeuralNet(Player):
 
         """
         # Update from start to end of neural network
-        self._hidden['activation'] = self._p(
+        self._hidden['activation'] = self._p1(
             self._Wi.dot(self._input) \
             - self._hidden['bias'] \
         )
 
-        self._output['activation'] = self._p(
+        self._output['activation'] = self._p2(
             self._Wo.dot(self._hidden['activation']) \
             - self._output['bias'] \
         )
