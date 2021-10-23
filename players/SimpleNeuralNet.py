@@ -35,6 +35,11 @@ class SimpleNeuralNet(Player):
         self._last_action = None
 
     def select_move(self, observation):
+
+        # Update the neural network based on our new score
+        # TODO
+
+        # Add data of any never-before-seen moves and state data
         actions = observation['moves']
         for action in actions:
             if action not in self._actions:
@@ -45,16 +50,23 @@ class SimpleNeuralNet(Player):
                 assert isinstance(var['value'], float) or isinstance(var['value'],int), 'Only accepting atomic numbers for SimpleNeuralNet'
                 self._add_variable(var)
 
-        ...
-        cdf = np.cumsum(softmax(self._output['activation']))
+
+        # Select the next move to make
+        # Not all actions we know about could be valid
+        valid = [action in actions for action in self._actions]
+        moves = [action for action in self._actions if action in actions]
+
+        cdf = np.cumsum(softmax(self._output['activation'][valid]))
         r = random_sample()
         move = 0
         while r > cdf[move]:
             move += 1
-        return self._actions[move]
+
+        self._last_action = self._moves[move]
+        return self._last_action
 
 
-    def _add_action(self, action): 
+    def _add_action(self, action):
         """Adds a new action type to the to network
 
         :action: A move
@@ -63,8 +75,8 @@ class SimpleNeuralNet(Player):
         """
         self._actions.append(action)
         self._Wo = np.r_[self._Wo, random_sample((1, self._n))]
-        self._output['bias'] = np.append(self._output['bias'], random_sample())
-        self._output['activation'] = np.append(self._output['activation'], 0)
+        self._output['bias'] = np.r_[self._output['bias'], random_sample((1, 1))]
+        self._output['activation'] = np.r_[self._output['activation'], np.zeros((1, 1))]
         self._update_activations()
 
     def _add_variable(self, var):
