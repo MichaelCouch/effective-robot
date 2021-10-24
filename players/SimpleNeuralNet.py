@@ -47,48 +47,36 @@ class SimpleNeuralNet(Player):
 
         if self._last_score and self._last_action:
             ## Update the neural network based on our new score
-            previous_state_action_value = self._output['activations'][self._actions.index(self._last_action)]
+            previous_state_action_value = self._output['activation'][self._actions.index(self._last_action)]
             new_score = observation['scores'][self._id]
             points_awarded = self._last_score = new_score
 
             # Update the state
             self._update_activations()
-            current_state_value = np.max(self._output['activations'])
+            current_state_value = np.max(self._output['activation'])
 
             error = points_awarded - (
                 previous_state_action_value - self._discount * current_state_value
             )
-            update_vector = np.zeros(self._output['activations'].shape)
+            update_vector = np.zeros(self._output['activation'].shape)
             update_vector[self._actions.index(self._last_action),1] = error
 
             # Update network weights and biases by gradient descent
 
-            dWi = (
-                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
-                * self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
-                * self._Wo * self._input
-            )
 
-            dWo = (
-                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
-                * self._hidden['activation']
-            )
+            dp2 = self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
+            dp1 = self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
 
-            dhb = - (
-                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
-                * self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
-                * self._Wo
-            )
+            dWo = np.tensordot(dp2, self._hidden['activation'],axes=(1,1))
+            dWi = np.tensordot(np.transpose(dp2 * self._Wo) * dp1, self._input, axes=0)
+            dob = - dp2
+            dhb = - np.transpose(dp2 * self._Wo) * dp1
 
-            dob = - (
-                self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
-            )
+            self._Wi += self._learning_rate * np.tensordot(dWi, update_vector,axes=([1,3], [0,1]))
+            self._hidden['bias'] += self._learning_rate * np.tensordot(dhb, update_vector, axes=(1,0))
+            self._Wo += self._learning_rate * dWo * update_vector
+            self._output['bias'] += self._learning_rate * dob * update_vector
 
-            self._Wi += self._learning_rate * dWi.dot(update_vector)
-            self._Wo += self._learning_rate * dWo.dot(update_vector)
-            self._hidden['bias'] += self._learning_rate * dhb.dot(update_vector)
-            self._output['bias'] += self._learning_rate * dob.dot(update_vector)
-            
 
         ## Add data of any never-before-seen moves and state data
         actions = observation['moves']
