@@ -36,7 +36,7 @@ class SimpleNeuralNet(Player):
         self._variables = []
         self._actions = []
 
-        self._last_score = None
+        self._last_score = 0
         self._last_action = None
 
     def _update_network(self, observation):
@@ -44,7 +44,7 @@ class SimpleNeuralNet(Player):
         """
         ## Update the neural network based on our new score
         previous_state_action_value = self._output['activation'][self._actions.index(self._last_action)]
-        new_score = observation['scores'][self._id]
+        new_score = observation['scores'][self.id]
         points_awarded = self._last_score = new_score
 
         # Update the state
@@ -55,13 +55,13 @@ class SimpleNeuralNet(Player):
             previous_state_action_value - self._discount * current_state_value
         )
         update_vector = np.zeros(self._output['activation'].shape)
-        update_vector[self._actions.index(self._last_action),1] = error
+        update_vector[self._actions.index(self._last_action), 0] = error
 
         # Update network weights and biases by gradient descent
         dp2 = self._dp2(self._Wo.dot(self._hidden['activation']) - self._output['bias'])
         dp1 = self._dp1(self._Wi.dot(self._input) - self._hidden['bias'])
 
-        dWo = np.tensordot(dp2, self._hidden['activation'],axes=(1,1))
+        dWo = np.tensordot(dp2, self._hidden['activation'], axes=(1,1))
         dWi = np.tensordot(np.transpose(dp2 * self._Wo) * dp1, self._input, axes=0)
         dob = - dp2
         dhb = - np.transpose(dp2 * self._Wo) * dp1
@@ -71,7 +71,7 @@ class SimpleNeuralNet(Player):
         self._Wo += self._learning_rate * dWo * update_vector
         self._output['bias'] += self._learning_rate * dob * update_vector
 
-    def _select_valid_move(self, obsercation):
+    def _select_valid_move(self, observation):
         """Use activation levels to randomly select a valid move to make.
 
         :obsercation: TODO
@@ -92,10 +92,11 @@ class SimpleNeuralNet(Player):
         return self._actions[move]
 
     def select_move(self, observation):
+
         # Update known state data
-        for var in observation['observations']:
+        for var in observation['observation']:
             if var['name'] in self._variables:
-                self._input[self._variables.index(var['name']),1] = var['value']
+                self._input[self._variables.index(var['name']), 0] = var['value']
 
         ## Update the neural network based on our new score
         if self._last_score and self._last_action:
@@ -112,11 +113,18 @@ class SimpleNeuralNet(Player):
 
         ## Select the next move to make
         self._update_activations()
-        next_action = self._select_valid_move(observation)
+        if observation['moves'] == ['GAME_OVER']:
+            next_action = 'GAME_OVER'
+            self._last_score = 0
+            self._last_action = None
 
-        self._last_score = observation['scores'][self._id]
-        self._last_action = next_action
-        return self._last_action
+        else:
+            next_action = self._select_valid_move(observation)
+
+            self._last_score = observation['scores'][self.id]
+            self._last_action = next_action
+        print(list(zip(*[self._output['activation'], self._actions])))
+        return next_action
 
 
     def _add_action(self, action):
