@@ -136,12 +136,16 @@ class CartPoleObservation():
     def __next__(self):
         """ Defines, what happens with "for item in self" """
         if self.n < len(self._data):
-            return self._data[self.n]
+            self.n += 1
+            return self._data[self.n-1]
         else:
             raise StopIteration
 
     def __str__(self):
         """ Defines what print(self) means """
+        if self._game_over:
+            return "The pole has fallen"
+
         top = "\n"
         track = "===o=====o===\n"
 
