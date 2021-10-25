@@ -38,7 +38,11 @@ class Game(object):
             next_player = self.get_next_player()
             self.take_turn(next_player)
 
-        return
+        # Inform all players the game is over
+        for id, player in self._players.items():
+            observation = self.get_player_observation(id)
+            observation['moves'] = ['GAME_OVER']
+            player['player'].select_move(observation)
 
     def take_turn(self, player_id):
         """Allow a player to take their turn in the game.
