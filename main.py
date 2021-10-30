@@ -8,7 +8,7 @@ from players import RandomPlayer
 from players import SimpleNeuralNet
 
 players = [
-    SimpleNeuralNet('C3PO', n=2),
+    SimpleNeuralNet('C3PO', n=2, visualize=True),
     # Human("Lily"),
     # Human("Michael"),
     RandomPlayer("Lilith")

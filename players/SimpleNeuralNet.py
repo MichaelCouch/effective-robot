@@ -8,7 +8,7 @@ class SimpleNeuralNet(Player):
 
     """A complete neural network with a single hidden layer and"""
 
-    def __init__(self, id, n, discount=0.9, learning_rate=0.1):
+    def __init__(self, id, n, discount=0.9, learning_rate=0.1, visualize=False):
         """
         The number of nodes in the hidden layer
         """
@@ -16,6 +16,9 @@ class SimpleNeuralNet(Player):
         self._n = n
         self._discount = discount
         self._learning_rate = learning_rate
+        self._visualize = visualize
+        if self._visualize:
+            self._start_image_window()
 
         self._input = random_sample((0, 1))
 
@@ -91,6 +94,39 @@ class SimpleNeuralNet(Player):
 
         return self._actions[move]
 
+    def _start_image_window(self):
+        """Initialize a pyglet window"""
+        import pyglet
+        from pyglet import shapes, clock
+        self._width =  640
+        self._height = 480
+        self._window = pyglet.window.Window(self._width, self._height)
+        self._batch = pyglet.graphics.Batch()
+        pyglet.app.run()
+
+
+    def _update_image(self):
+        """Update the image
+        :returns: None
+
+        """
+        input_x = self._width * 1 / 8
+        hidden_x = 640 * 1 / 2
+        action_x = self._width * 7 / 8
+
+        for i, var in enumerate(self._input):
+            shapes.Circle(input_x, self._height * (i+1)/(len(self._input) + 1),5,
+                          color = (155,155,155), batch=self._batch)
+        for i, var in enumerate(self._hidden['activation']):
+            shapes.Circle(hidden_x, self._height * (i+1)/(len(self._hidden['activation']) + 1),5,
+                          color = (155,155,155), batch=self._batch)
+        for i, var in enumerate(self._output['activation']):
+            shapes.Circle(action_x, self._height * (i+1)/(len(self._hidden['output']) + 1),5,
+                          color = (155,155,155), batch=self._batch)
+        self._window.clear()
+        self._batch.draw()
+
+
     def select_move(self, observation):
 
         # Update known state data
@@ -113,11 +149,12 @@ class SimpleNeuralNet(Player):
 
         ## Select the next move to make
         self._update_activations()
+        if self._visualize:
+            self._update_image()
         if observation['moves'] == ['GAME_OVER']:
             next_action = 'GAME_OVER'
             self._last_score = 0
             self._last_action = None
-
         else:
             next_action = self._select_valid_move(observation)
 
